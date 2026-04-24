@@ -18,13 +18,11 @@ let currentColor = "";
 let currentWord = "";
 
 let globalTime = 0;
-let questionTime = 5;
-
 let globalTimer;
 let questionTimer;
 
-const TOKEN = "8717297177:AAH7l7EW3-Mz7_oOXLup4wAKNGJTUtpGZ0E";
-const CHAT_ID = "8717297177";
+const TOKEN = 717297177:AAH7l7EW3-Mz7_oOXLup4wAKNGJTUtpGZ0E;
+const CHAT_ID = 8717297177; // 
 
 function startTest() {
   const name = document.getElementById("name").value.trim();
@@ -39,13 +37,36 @@ function startTest() {
 function startGlobalTimer() {
   globalTimer = setInterval(() => {
     globalTime++;
-    document.getElementById("timer").innerText =
-      "Час: " + globalTime + " сек";
+    document.getElementById("timer").innerText = "Час: " + globalTime + " сек";
   }, 1000);
 }
 
+function newWord() {
+  clearInterval(questionTimer);
+
+  if (question >= total) {
+    finishTest();
+    return;
+  }
+
+  let text = colors[Math.floor(Math.random() * colors.length)];
+  let color = colors[Math.floor(Math.random() * colors.length)];
+
+  currentColor = color;
+  currentWord = text;
+
+  document.getElementById("word").innerText = colorUA[text];
+  document.getElementById("word").style.color = color;
+
+  stage = question < total / 2 ? 1 : 2;
+  renderButtons();
+
+  question++;
+  startQuestionTimer();
+}
+
 function startQuestionTimer() {
-  let timeLeft = questionTime;
+  let timeLeft = 5;
   clearInterval(questionTimer);
 
   questionTimer = setInterval(() => {
@@ -55,14 +76,12 @@ function startQuestionTimer() {
       return;
     }
 
-    document.getElementById("timer").innerText =
-      "Час: " + timeLeft + " сек";
-
+    document.getElementById("timer").innerText = "Час: " + timeLeft + " сек";
     timeLeft--;
   }, 1000);
 }
 
-function renderButtons(stage) {
+function renderButtons() {
   if (stage === 1) {
     document.getElementById("stageText").innerText = "Етап 1: Колір";
 
@@ -84,51 +103,16 @@ function renderButtons(stage) {
   }
 }
 
-function newWord() {
+function checkColor(ans) {
   clearInterval(questionTimer);
-
-  if (question >= total) {
-    finishTest();
-    return;
-  }
-
-  let text = colors[Math.floor(Math.random() * colors.length)];
-  let color = colors[Math.floor(Math.random() * colors.length)];
-
-  currentColor = color;
-  currentWord = text;
-
-  document.getElementById("word").innerText = colorUA[text];
-  document.getElementById("word").style.color = color;
-
-  stage = question < total / 2 ? 1 : 2;
-  renderButtons(stage);
-
-  question++;
-  startQuestionTimer();
-}
-
-function checkColor(answer) {
-  clearInterval(questionTimer);
-
-  if (stage === 1 && answer === currentColor) correct++;
-
-  updateInfo();
+  if (stage === 1 && ans === currentColor) correct++;
   newWord();
 }
 
-function checkWord(answer) {
+function checkWord(ans) {
   clearInterval(questionTimer);
-
-  if (stage === 2 && answer === currentWord) correct++;
-
-  updateInfo();
+  if (stage === 2 && ans === currentWord) correct++;
   newWord();
-}
-
-function updateInfo() {
-  document.getElementById("info").innerText =
-    `Рахунок: ${correct} / ${question}`;
 }
 
 function finishTest() {
@@ -149,7 +133,6 @@ function finishTest() {
 function sendToTelegram(data) {
   const text =
 `🧠 Тест Струпа
-
 👤 Ім'я: ${data.name}
 ✅ Результат: ${data.score}/${data.total}
 ⏱ Час: ${data.time} сек`;
@@ -164,8 +147,8 @@ function sendToTelegram(data) {
       text: text
     })
   })
-  .then(res => res.json())
-  .then(res => console.log("OK:", res))
-  .catch(err => console.error("ERROR:", err));
+  .then(r => r.json())
+  .then(r => console.log("OK", r))
+  .catch(e => console.error("ERROR", e));
 }
 </script>
