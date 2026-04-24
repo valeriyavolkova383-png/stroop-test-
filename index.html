@@ -1,62 +1,4 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-<meta charset="UTF-8">
-<title>Тест Струпа</title>
-
-<style>
-  body {
-    font-family: Arial;
-    text-align: center;
-    margin-top: 60px;
-  }
-
-  #word {
-    font-size: 60px;
-    font-weight: bold;
-    margin: 40px;
-  }
-
-  button {
-    font-size: 18px;
-    margin: 8px;
-    padding: 10px 15px;
-    cursor: pointer;
-  }
-
-  input {
-    font-size: 18px;
-    padding: 8px;
-  }
-
-  #timer {
-    font-size: 18px;
-    margin: 10px;
-  }
-</style>
-</head>
-
-<body>
-
-<h1>Тест Струпа</h1>
-
-<p>Введи ім’я:</p>
-<input type="text" id="name">
-
-<br><br>
-<button onclick="startTest()">Почати</button>
-
-<div id="test" style="display:none;">
-  <h3 id="stageText"></h3>
-  <p id="timer">Час: 0 сек</p>
-  <div id="word">ГОТОВО</div>
-  <div id="buttons"></div>
-  <p id="info"></p>
-</div>
-
 <script>
-const URL = "https://script.google.com/macros/s/AKfycbxoAzVpB5yy0OA318rBwkoDt4Kob1fQ-KjwAzlf4H7OWnmAjEXRhF8bKL0a56SLQr7I/exec";
-
 const colors = ["red", "blue", "green", "yellow"];
 
 const colorUA = {
@@ -81,12 +23,13 @@ let questionTime = 5;
 let globalTimer;
 let questionTimer;
 
+// 🔴 TELEGRAM НАСТРОЙКА
+const TOKEN = "ТВОЙ_НОВИЙ_TOKEN";
+const CHAT_ID = "ТВОЙ_CHAT_ID";
+
 function startTest() {
   const name = document.getElementById("name").value.trim();
-  if (!name) {
-    alert("Введи ім’я!");
-    return;
-  }
+  if (!name) return alert("Введи ім'я!");
 
   document.getElementById("test").style.display = "block";
 
@@ -98,19 +41,17 @@ function startGlobalTimer() {
   globalTimer = setInterval(() => {
     globalTime++;
     document.getElementById("timer").innerText =
-      "Загальний час: " + globalTime + " сек";
+      "Час: " + globalTime + " сек";
   }, 1000);
 }
 
 function startQuestionTimer() {
   let timeLeft = questionTime;
-
   clearInterval(questionTimer);
 
   questionTimer = setInterval(() => {
     if (timeLeft < 0) {
       clearInterval(questionTimer);
-      document.getElementById("info").innerText = "Час вийшов!";
       newWord();
       return;
     }
@@ -124,8 +65,7 @@ function startQuestionTimer() {
 
 function renderButtons(stage) {
   if (stage === 1) {
-    document.getElementById("stageText").innerText =
-      "Етап 1: Вибери КОЛІР";
+    document.getElementById("stageText").innerText = "Етап 1: Колір";
 
     document.getElementById("buttons").innerHTML = `
       <button onclick="checkColor('red')">Червоний</button>
@@ -134,8 +74,7 @@ function renderButtons(stage) {
       <button onclick="checkColor('yellow')">Жовтий</button>
     `;
   } else {
-    document.getElementById("stageText").innerText =
-      "Етап 2: Вибери СЛОВО";
+    document.getElementById("stageText").innerText = "Етап 2: Слово";
 
     document.getElementById("buttons").innerHTML = `
       <button onclick="checkWord('red')">Червоний</button>
@@ -163,13 +102,8 @@ function newWord() {
   document.getElementById("word").innerText = colorUA[text];
   document.getElementById("word").style.color = color;
 
-  if (question < total / 2) {
-    stage = 1;
-    renderButtons(1);
-  } else {
-    stage = 2;
-    renderButtons(2);
-  }
+  stage = question < total / 2 ? 1 : 2;
+  renderButtons(stage);
 
   question++;
   startQuestionTimer();
@@ -178,9 +112,7 @@ function newWord() {
 function checkColor(answer) {
   clearInterval(questionTimer);
 
-  if (stage === 1 && answer === currentColor) {
-    correct++;
-  }
+  if (stage === 1 && answer === currentColor) correct++;
 
   updateInfo();
   newWord();
@@ -189,9 +121,7 @@ function checkColor(answer) {
 function checkWord(answer) {
   clearInterval(questionTimer);
 
-  if (stage === 2 && answer === currentWord) {
-    correct++;
-  }
+  if (stage === 2 && answer === currentWord) correct++;
 
   updateInfo();
   newWord();
@@ -204,39 +134,36 @@ function updateInfo() {
 
 function finishTest() {
   clearInterval(globalTimer);
+
   document.getElementById("word").innerText = "ЗАВЕРШЕНО";
 
   const name = document.getElementById("name").value;
 
-  const data = {
-    name: name,
+  sendToTelegram({
+    name,
     score: correct,
-    total: total,
+    total,
     time: globalTime
-  };
-
-  sendToGoogle(data);
+  });
 }
 
-function sendToGoogle(data) {
-  fetch(URL, {
+function sendToTelegram(data) {
+  const text =
+`🧠 Тест Струпа
+
+👤 Ім'я: ${data.name}
+✅ Результат: ${data.score}/${data.total}
+⏱ Час: ${data.time} сек`;
+
+  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.text())
-  .then(res => {
-    console.log("Успішно:", res);
-    document.getElementById("info").innerText += " | Дані збережено ✅";
-  })
-  .catch(err => {
-    console.error("Помилка:", err);
-    document.getElementById("info").innerText += " | Помилка збереження ❌";
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: text
+    })
   });
 }
 </script>
-
-</body>
-</html>
