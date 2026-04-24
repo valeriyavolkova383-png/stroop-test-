@@ -160,11 +160,9 @@ function newWord() {
 
     let name = document.getElementById("name").value;
 
-    fetch("https://script.google.com/macros/s/AKfycbzjWJbsT3JU8a-Ky08QxNUXWUXu4wkw4sQHdTxgl7_j0mVaaquXElGMsdJ1uUtWVHvz/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbxoAzVpB5yy0OA318rBwkoDt4Kob1fQ-KjwAzlf4H7OWnmAjEXRhF8bKL0a56SLQr7I/exec", {
       method: "POST",
       mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         name: name,
