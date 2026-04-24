@@ -23,9 +23,9 @@ let questionTime = 5;
 let globalTimer;
 let questionTimer;
 
-// 🔴 TELEGRAM НАСТРОЙКА
-const TOKEN = "ТВОЙ_НОВИЙ_TOKEN";
-const CHAT_ID = "ТВОЙ_CHAT_ID";
+// 🔑 TELEGRAM (ВСТАВ СЮДИ СВОЇ ДАНІ)
+const TOKEN = "ТВІЙ_TOKEN";
+const CHAT_ID = "ТВІЙ_CHAT_ID";
 
 function startTest() {
   const name = document.getElementById("name").value.trim();
@@ -57,7 +57,7 @@ function startQuestionTimer() {
     }
 
     document.getElementById("timer").innerText =
-      "Час на відповідь: " + timeLeft + " сек";
+      "Час: " + timeLeft + " сек";
 
     timeLeft--;
   }, 1000);
@@ -155,16 +155,18 @@ function sendToTelegram(data) {
 ✅ Результат: ${data.score}/${data.total}
 ⏱ Час: ${data.time} сек`;
 
-  fetch(`https://api.telegram.org/bot${8717297177:AAH7l7EW3-Mz7_oOXLup4wAKNGJTUtpGZ0E}/sendMessage`, {
+  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      chat_id:8717297177,
+      chat_id: CHAT_ID,
       text: text
     })
-  });
-
+  })
+  .then(res => res.json())
+  .then(res => console.log("OK:", res))
+  .catch(err => console.error("ERROR:", err));
 }
 </script>
