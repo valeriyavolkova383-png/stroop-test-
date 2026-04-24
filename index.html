@@ -155,15 +155,16 @@ function sendToTelegram(data) {
 ✅ Результат: ${data.score}/${data.total}
 ⏱ Час: ${data.time} сек`;
 
-  fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+  fetch(`https://api.telegram.org/bot${8717297177:AAH7l7EW3-Mz7_oOXLup4wAKNGJTUtpGZ0E}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      chat_id: CHAT_ID,
+      chat_id:8717297177,
       text: text
     })
   });
+
 }
 </script>
